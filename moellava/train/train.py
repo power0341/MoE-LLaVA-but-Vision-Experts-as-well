@@ -36,7 +36,7 @@ from moellava.train.llava_trainer import LLaVATrainer
 
 from moellava import conversation as conversation_lib
 from moellava.model import *
-from moellava.mm_utils import tokenizer_image_token
+from moellava.mm_utils import expand2square, tokenizer_image_token
 
 from PIL import Image
 from moellava.utils import order_pick_k
@@ -48,20 +48,28 @@ def rank0_print(*args):
     if local_rank == 0:
         print(*args)
 
-
 @dataclass
 class ModelArguments:
     model_name_or_path: Optional[str] = field(default="facebook/opt-125m")
     version: Optional[str] = field(default="v0")
     freeze_backbone: bool = field(default=False)
     tune_mm_mlp_adapter: bool = field(default=False)
-    mm_vision_select_layer: Optional[int] = field(default=-1)   # default to the last layer
     pretrain_mm_mlp_adapter: Optional[str] = field(default=None)
+    mm_vision_select_layer: Optional[int] = field(default=-1)   # default to the last layer
     mm_use_im_start_end: bool = field(default=False)
     mm_use_im_patch_token: bool = field(default=True)
     mm_vision_select_feature: Optional[str] = field(default="patch")
     # ===================================================================
     image_tower: Optional[str] = field(default=None)
+    vision_expert_clip_image_tower: Optional[str] = field(default=None)
+    vision_expert_clip_mm_vision_select_layer: Optional[int] = field(default=-1)
+    vision_expert_clip_mm_vision_select_feature: Optional[str] = field(default="patch")
+    vision_expert_depth_anything_image_tower: Optional[str] = field(default=None)
+    vision_expert_depth_anything_mm_vision_select_layer: Optional[int] = field(default=-1)
+    vision_expert_depth_anything_mm_vision_select_feature: Optional[str] = field(default="patch")
+    vision_expert_owlv2_image_tower: Optional[str] = field(default=None)
+    vision_expert_owlv2_mm_vision_select_layer: Optional[int] = field(default=-1)
+    vision_expert_owlv2_mm_vision_select_feature: Optional[str] = field(default="patch")
     video_tower: Optional[str] = field(default=None)
     image_projector_type: Optional[str] = field(default='linear')
     video_projector_type: Optional[str] = field(default='linear')
@@ -904,21 +912,6 @@ def preprocess(
         _mask_targets(target, tokenized_lens, speakers)
 
     return dict(input_ids=input_ids, labels=targets)
-
-
-
-def expand2square(pil_img, background_color):
-    width, height = pil_img.size
-    if width == height:
-        return pil_img
-    elif width > height:
-        result = Image.new(pil_img.mode, (width, width), background_color)
-        result.paste(pil_img, (0, (width - height) // 2))
-        return result
-    else:
-        result = Image.new(pil_img.mode, (height, height), background_color)
-        result.paste(pil_img, ((height - width) // 2, 0))
-        return result
 
 class LazySupervisedDataset(Dataset):
     """Dataset for supervised fine-tuning."""

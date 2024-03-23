@@ -4,6 +4,8 @@ import transformers
 a, b, c = transformers.__version__.split('.')[:3]
 if a == '4' and int(b) >= 37:
     from .siglip_encoder import SiglipVisionTower
+if a == '4' and int(b) >= 39:
+    from .visual_experts_group import VisualExpertsGroup
 # from .languagebind import LanguageBindImageTower, LanguageBindVideoTower
 
 # ============================================================================================================
@@ -15,6 +17,8 @@ def build_image_tower(image_tower_cfg, **kwargs):
         return CLIPVisionTower(image_tower, args=image_tower_cfg, cache_dir='./cache_dir', **kwargs)
     if image_tower.startswith("google"):
         return SiglipVisionTower(image_tower, args=image_tower_cfg, cache_dir='./cache_dir', **kwargs)
+    if "group" in image_tower.lower():
+        return VisualExpertsGroup(image_tower, args=image_tower_cfg, cache_dir='./cache_dir', **kwargs)
     if image_tower.endswith('LanguageBind_Image'):
         return LanguageBindImageTower(image_tower, args=image_tower_cfg, cache_dir='./cache_dir', **kwargs)
 

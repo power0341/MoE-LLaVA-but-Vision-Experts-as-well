@@ -1,15 +1,39 @@
 from PIL import Image
 from io import BytesIO
 import base64
-
+import numpy as np
 import torch
 from transformers import StoppingCriteria
 from moellava.constants import IMAGE_TOKEN_INDEX
 
-
 def load_image_from_base64(image):
     return Image.open(BytesIO(base64.b64decode(image)))
 
+
+# def expand2square(pil_img, background_color):
+#     width, height = pil_img.size
+#     if width == height:
+#         result = Image.new("RGBA", (width, width), background_color)
+#         result.paste(pil_img, (0, 0))
+#         return result
+#     elif width > height:
+#         result = Image.new("RGBA", (width, width), background_color)
+#         result.paste(pil_img, (0, (width - height) // 2))
+#         result = np.array(result)
+#         height_start = (width - height) // 2
+#         height_end = width - (width - height) // 2
+#         result[:,:,3] = 0
+#         result[height_start:height_end,:,3] = 255
+#         return Image.fromarray(result)
+#     else:
+#         result = Image.new("RGBA", (height, height), background_color)
+#         result.paste(pil_img, ((height - width) // 2, 0))
+#         result = np.array(result)
+#         width_start = (height - width) // 2
+#         width_end = height - (height - width) // 2
+#         result[:,:,3] = 0
+#         result[:,width_start:width_end,3] = 255
+#         return Image.fromarray(result)
 
 def expand2square(pil_img, background_color):
     width, height = pil_img.size
@@ -38,6 +62,7 @@ def process_images(images, image_processor, model_cfg):
     if all(x.shape == new_images[0].shape for x in new_images):
         new_images = torch.stack(new_images, dim=0)
     return new_images
+    
 
 
 def tokenizer_image_token(prompt, tokenizer, image_token_index=IMAGE_TOKEN_INDEX, return_tensors=None):
