@@ -11,7 +11,7 @@ IMAGE_FOLDER="/hotdata/xly/llava-moe-data"
 HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 deepspeed --master_port 60001 moellava/train/train_mem.py \
     --moe_enable True --num_experts ${num_experts} --top_k_experts ${top_k_experts} --capacity_factor 1.5 \
     --moe_mode ${moe_mode} --use_residual ${use_residual} --router_aux_loss_coef ${router_aux_loss_coef} \
-    --train_modules mlp.w1 mlp.w2 mlp.c_proj wg \
+    --train_modules gate_proj up_proj down_proj wg \
     --deepspeed ./scripts/zero2_offload.json \
     --model_name_or_path /data1/xly/models/llava_moe/llavaqwen1.5-1.8b-finetune/checkpoint-72 \
     --version qwen \
@@ -36,7 +36,7 @@ HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 deepspeed --master_port 60001 moell
     --gradient_accumulation_steps 8 \
     --evaluation_strategy "no" \
     --save_strategy "steps" \
-    --save_steps 24 \
+    --save_steps 2400 \
     --save_total_limit 1 \
     --learning_rate 2e-5 \
     --weight_decay 0. \
