@@ -61,6 +61,7 @@ class ModelArguments:
     mm_vision_select_feature: Optional[str] = field(default="patch")
     # ===================================================================
     image_tower: Optional[str] = field(default=None)
+    vision_experts_group_hidden_size: Optional[int] = field(default=-1)
     vision_expert_clip_image_tower: Optional[str] = field(default=None)
     vision_expert_clip_mm_vision_select_layer: Optional[int] = field(default=-1)
     vision_expert_clip_mm_vision_select_feature: Optional[str] = field(default="patch")

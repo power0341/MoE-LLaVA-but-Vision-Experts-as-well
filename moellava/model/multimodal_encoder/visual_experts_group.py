@@ -41,6 +41,7 @@ class VisualExpertsGroup(torch.nn.Module):
 
         self.image_tower_names = image_tower
         self.experts = torch.nn.ModuleList()
+        self.group_hidden_size = args.vision_experts_group_hidden_size
         self.cache_dir = cache_dir
         clip_args, da_args, owl_args = parse_subargs(args)
 
@@ -151,3 +152,7 @@ class VisualExpertsGroup(torch.nn.Module):
     @property
     def device(self):
         return self.experts[1].device
+        
+    @property
+    def hidden_size(self):
+        return self.group_hidden_size

@@ -29,6 +29,11 @@ def build_image_projector(config, delay_load=False, **kwargs):
     is_cheap = 'cheap' in projector_type
     projector_type = projector_type.replace('cheap_', '') if is_cheap else projector_type
 
+    add_layernorm = False
+    if "_norm" in projector_type:
+        projector_type = projector_type.replace("_norm", "")
+        add_layernorm = True
+        
     if projector_type == 'linear':
         return nn.Linear(config.mm_hidden_size, config.hidden_size)
 
@@ -52,6 +57,8 @@ def build_image_projector(config, delay_load=False, **kwargs):
         if mlp_gelu_match:
             mlp_depth = int(mlp_gelu_match.group(1))
             modules = [nn.Linear(config.mm_hidden_size, config.hidden_size)]
+            if add_layernorm:
+                modules.append(nn.LayerNorm(config.hidden_size))
             for _ in range(1, mlp_depth):
                 modules.append(nn.GELU())
                 modules.append(nn.Linear(config.hidden_size, config.hidden_size))

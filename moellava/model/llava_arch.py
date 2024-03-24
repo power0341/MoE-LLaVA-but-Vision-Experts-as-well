@@ -131,6 +131,17 @@ class LlavaMetaModel:
                 return {k.split(keyword + '.')[1]: v for k, v in weights.items() if keyword in k}
 
             self.mm_projector.load_state_dict(get_w(mm_projector_weights, 'mm_projector'))
+        if image_tower is not None and 'experts_group' in self.config.mm_image_tower.lower():
+            self.config.vision_experts_group_hidden_size = getattr(model_args, 'vision_experts_group_hidden_size', None)
+            self.config.vision_expert_clip_image_tower = getattr(model_args, 'vision_expert_clip_image_tower', None)
+            self.config.vision_expert_clip_mm_vision_select_layer = getattr(model_args, 'vision_expert_clip_mm_vision_select_layer', None)
+            self.config.vision_expert_clip_mm_vision_select_feature = getattr(model_args, 'vision_expert_clip_mm_vision_select_feature', None)
+            self.config.vision_expert_depth_anything_image_tower = getattr(model_args, 'vision_expert_depth_anything_image_tower', None)
+            self.config.vision_expert_depth_anything_mm_vision_select_layer = getattr(model_args, 'vision_expert_depth_anything_mm_vision_select_layer', None)
+            self.config.vision_expert_depth_anything_mm_vision_select_feature = getattr(model_args, 'vision_expert_depth_anything_mm_vision_select_feature', None)
+            self.config.vision_expert_owlv2_image_tower = getattr(model_args, 'vision_expert_owlv2_image_tower', None)
+            self.config.vision_expert_owlv2_mm_vision_select_layer = getattr(model_args, 'vision_expert_owlv2_mm_vision_select_layer', None)
+            self.config.vision_expert_owlv2_mm_vision_select_feature = getattr(model_args, 'vision_expert_owlv2_mm_vision_select_feature', None)
 
 
 class LlavaMetaForCausalLM(ABC):

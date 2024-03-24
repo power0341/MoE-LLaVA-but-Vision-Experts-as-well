@@ -12,15 +12,16 @@ if a == '4' and int(b) >= 39:
 
 def build_image_tower(image_tower_cfg, **kwargs):
     image_tower = getattr(image_tower_cfg, 'mm_image_tower', getattr(image_tower_cfg, 'image_tower', None))
+    cache_dir = kwargs.get('cache_dir', '/data1/xly/models')
     # is_absolute_path_exists = os.path.exists(image_tower)
     if image_tower.startswith("openai") or image_tower.startswith("laion"):
-        return CLIPVisionTower(image_tower, args=image_tower_cfg, cache_dir='./cache_dir', **kwargs)
+        return CLIPVisionTower(image_tower, args=image_tower_cfg, cache_dir=cache_dir, **kwargs)
     if image_tower.startswith("google"):
-        return SiglipVisionTower(image_tower, args=image_tower_cfg, cache_dir='./cache_dir', **kwargs)
+        return SiglipVisionTower(image_tower, args=image_tower_cfg, cache_dir=cache_dir, **kwargs)
     if "group" in image_tower.lower():
-        return VisualExpertsGroup(image_tower, args=image_tower_cfg, cache_dir='./cache_dir', **kwargs)
+        return VisualExpertsGroup(image_tower, args=image_tower_cfg, cache_dir=cache_dir, **kwargs)
     if image_tower.endswith('LanguageBind_Image'):
-        return LanguageBindImageTower(image_tower, args=image_tower_cfg, cache_dir='./cache_dir', **kwargs)
+        return LanguageBindImageTower(image_tower, args=image_tower_cfg, cache_dir=cache_dir, **kwargs)
 
     raise ValueError(f'Unknown image tower: {image_tower}')
 
