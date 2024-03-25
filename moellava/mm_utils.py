@@ -1,8 +1,9 @@
 from PIL import Image
 from io import BytesIO
 import base64
-import numpy as np
+from torchvision.transforms import functional as tvf
 import torch
+
 from transformers import StoppingCriteria
 from moellava.constants import IMAGE_TOKEN_INDEX
 
@@ -47,6 +48,24 @@ def expand2square(pil_img, background_color):
         result = Image.new(pil_img.mode, (height, height), background_color)
         result.paste(pil_img, ((height - width) // 2, 0))
         return result
+    
+def longest_resize(pil_img, size, longest_side, pad_to, background_color):
+    pil_img = tvf.resize(pil_img, size=size, max_size=longest_side)
+    width, height = pil_img.size
+    if max(width, height) == longest_side and min(width, height) < size:
+        if width < height:
+            pad_left = (pad_to - width) // 2
+            pad_top = 0
+            pad_right = pad_to - width - pad_left
+            pad_bottom = 0
+        else:
+            pad_left = 0
+            pad_top = (pad_to - height) // 2
+            pad_right = 0
+            pad_bottom = pad_to - height - pad_top
+        pil_img = tvf.pad(pil_img, (pad_left, pad_top, pad_right, pad_bottom), background_color)
+        
+    return pil_img
 
 
 def process_images(images, image_processor, model_cfg):

@@ -41,7 +41,7 @@ HF_DATASETS_OFFLINE=1 TRANSFORMERS_OFFLINE=1 deepspeed --master_port 60001 moell
     --logging_steps 1 \
     --tf32 True \
     --model_max_length 2048 \
-    --gradient_checkpointing False \
+    --gradient_checkpointing True \
     --dataloader_num_workers 4 \
     --lazy_preprocess True \
     --report_to tensorboard \

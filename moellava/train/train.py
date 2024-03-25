@@ -36,7 +36,7 @@ from moellava.train.llava_trainer import LLaVATrainer
 
 from moellava import conversation as conversation_lib
 from moellava.model import *
-from moellava.mm_utils import expand2square, tokenizer_image_token
+from moellava.mm_utils import expand2square, tokenizer_image_token, longest_resize
 
 from PIL import Image
 from moellava.utils import order_pick_k
@@ -979,6 +979,9 @@ class LazySupervisedDataset(Dataset):
                 if self.data_args.image_aspect_ratio == 'pad':
                     image = [expand2square(i, tuple(int(x * 255) for x in image_processor.image_mean)) for i in image]
                     image = [image_processor.preprocess(i, return_tensors='pt')['pixel_values'][0] for i in image]
+                elif self.data_args.image_aspect_ratio == 'square':
+                    image = [longest_resize(i, image_processor.size['height'], image_processor.size['height'] * 4, image_processor.size['height'], tuple(int(x * 255) for x in image_processor.image_mean)) for i in image]
+                    image = [image_processor.preprocess(i, return_tensors='pt')['pixel_values'][0] for i in image]
                 else:
                     image = [image_processor.preprocess(i, return_tensors='pt')['pixel_values'][0] for i in image]
                 # print(image[0].shape)
@@ -1016,6 +1019,9 @@ class LazySupervisedDataset(Dataset):
                 image = [Image.open(os.path.join(image_folder, file)).convert('RGB') for file in image_file]
                 if self.data_args.image_aspect_ratio == 'pad':
                     image = [expand2square(i, tuple(int(x * 255) for x in image_processor.image_mean)) for i in image]
+                    image = [image_processor.preprocess(i, return_tensors='pt')['pixel_values'][0] for i in image]
+                elif self.data_args.image_aspect_ratio == 'square':
+                    image = [longest_resize(i, image_processor.size['height'], image_processor.size['height'] * 4, image_processor.size['height'], tuple(int(x * 255) for x in image_processor.image_mean)) for i in image]
                     image = [image_processor.preprocess(i, return_tensors='pt')['pixel_values'][0] for i in image]
                 else:
                     image = [image_processor.preprocess(i, return_tensors='pt')['pixel_values'][0] for i in image]
